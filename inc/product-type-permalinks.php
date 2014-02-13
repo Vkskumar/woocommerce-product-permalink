@@ -108,9 +108,12 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 		}
 
 		public function activate(){
-			// $this->create_rewrites();
 			// let the plugin know we need to flush the permalinks
 			update_option( parent::$option_flush_key, 'yes' );
+		}
+
+		public function deactivate(){
+			parent::deactivate();
 		}
 	}
 }

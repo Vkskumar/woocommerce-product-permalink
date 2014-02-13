@@ -28,6 +28,8 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 				'external' => 'external-product'
 				));
 
+			$this->create_rewrites();
+
 		}
 
 		/**
@@ -45,9 +47,6 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 		 * add custom permastructures for products
 		 */
 		public function create_rewrites(){
-
-			// let the plugin know we need to flush the permalinks
-			update_option( parent::$option_flush_key, 'yes' );
 
 			// assuming default woocommerce product types:
 			// * simple
@@ -109,7 +108,9 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 		}
 
 		public function activate(){
-			$this->create_rewrites();
+			// $this->create_rewrites();
+			// let the plugin know we need to flush the permalinks
+			update_option( parent::$option_flush_key, 'yes' );
 		}
 	}
 }

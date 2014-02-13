@@ -12,10 +12,6 @@
 if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 	class WC_Product_Type_Permalink extends WC_Product_Permalink{
 
-		const VERSION = '1.0.0';
-		const MIN_WOO_VERSION = 'x.x';
-		// private static $_this = null;
-		private $option_flush_key = 'woocommerce_post_type_permalink_flush_rewrite_rules';
 		private $product_types;
 		private $query_var = 'strict_product_type';
 
@@ -50,6 +46,9 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 		 */
 		public function create_rewrites(){
 
+			// let the plugin know we need to flush the permalinks
+			update_option( parent::$option_flush_key, 'yes' );
+
 			// assuming default woocommerce product types:
 			// * simple
 			// * variable
@@ -63,7 +62,6 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 					));
 			}
 
-			parent::flush_rewrites();
 		}
 
 		/**

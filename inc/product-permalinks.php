@@ -14,21 +14,14 @@
 if( !class_exists( 'WC_Product_Permalink' ) ){
 	class WC_Product_Permalink{
 
-		private static $option_flush_key = 'woocommerce_product_permalink_flush_rewrite_rules';
-		private $product_types;
+		public static $option_flush_key = 'woocommerce_product_permalink_flush_rewrite_rules';
 		private $query_vars = array();
 
 		function __construct(){
 			
 			add_filter( 'woocommerce_register_post_type_product', array( $this, 'woocommerce_register_post_type_product' ) );
 			add_filter( 'query_vars', array( $this, 'query_vars' ) );
-
-			$this->product_types = apply_filters( 'WC_Product_Permalink/product_types', array( 
-				'simple' => 'simple-product', 
-				'variable' => 'variable-product', 
-				'grouped' => 'grouped-product',
-				'external' => 'external-product'
-				));
+			add_filter( 'admin_init', array( $this, 'admin_init' ) );
 
 		}
 
@@ -76,11 +69,9 @@ if( !class_exists( 'WC_Product_Permalink' ) ){
 		 * @return null
 		 */
 		public function flush_rewrites(){
-			if ( get_option( self::$option_flush_key ) == false ) {
+			if ( 'yes' == get_option( self::$option_flush_key ) ) {
 		        flush_rewrite_rules();
-		        update_option( self::$option_flush_key, true);
-		        echo 'flushe';
-		        die;
+		        update_option( self::$option_flush_key, 'no');
 		    }
 		}
 

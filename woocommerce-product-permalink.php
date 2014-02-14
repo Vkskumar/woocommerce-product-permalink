@@ -66,12 +66,8 @@ if( !class_exists('WC_Product_Permalink_Factory') ){
 		 */
 		public function __construct() {
 
-			// Include required files
-			$this->includes();
-
-			$this->init();
-			// $this->activate();
-			// $this->deactivate();
+			// ensure the required files are loaded
+			$this->load_classes();
 
 			// Loaded action
 			do_action( 'WC_Product_Permalink_Factory/loaded' );
@@ -81,14 +77,18 @@ if( !class_exists('WC_Product_Permalink_Factory') ){
 		private function includes() {
 
 			// assumes plugin_dir_path( __FILE__ )
+			// include_once( 'inc/wc-product-type-settings.php');
 			include_once( 'inc/product-permalinks.php' );
 			include_once( 'inc/product-type-permalinks.php' );
 
+			do_action( 'WC_Product_Permalink_Factory/includes' );
+
 		}
 
-		function init(){
+		public function load_classes(){
 
-			do_action( 'WC_Product_Permalink_Factory/init' );
+			// ensure the required files are loaded
+			$this->includes();
 
 			// Load custom product permalink classes
 			$load_classes = apply_filters( 'WC_Product_Permalink_Factory/load_classes', array( 'WC_Product_Permalink', 'WC_Product_Type_Permalink' ) );
@@ -96,13 +96,17 @@ if( !class_exists('WC_Product_Permalink_Factory') ){
 				$class = new $class();
 				$this->factory[ get_class( $class ) ] = $class;
 			}
+
+			return $this->factory;
 		}
 
 		/**
 		 * on plugin activate ensure the permalinks are flushed
 		 */
 		public static function activate(){
-			foreach( self::instance()->factory as $class ) {
+
+			$factory = self::instance()->load_classes();
+			foreach( $factory as $class ) {
 				if( method_exists( $class, 'activate' ) )
 					$class->activate();
 			}
@@ -113,10 +117,7 @@ if( !class_exists('WC_Product_Permalink_Factory') ){
 		 * on plugin deactivate ensure the permalinks are flushed and db is cleaned up
 		 */
 		public static function deactivate(){
-			foreach( self::instance()->factory as $class ) {
-				if( method_exists( $class, 'deactivate' ) )
-					$class->deactivate();
-			}
+			WC_Product_Permalink::deactivate();
 			do_action( 'WC_Product_Permalink_Factory/deactivate' );
 		}
 

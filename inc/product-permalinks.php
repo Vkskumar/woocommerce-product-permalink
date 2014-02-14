@@ -21,7 +21,7 @@ if( !class_exists( 'WC_Product_Permalink' ) ){
 			
 			add_filter( 'woocommerce_register_post_type_product', array( $this, 'woocommerce_register_post_type_product' ) );
 			add_filter( 'query_vars', array( $this, 'query_vars' ) );
-			add_filter( 'admin_init', array( $this, 'admin_init' ) );
+			add_filter( 'admin_init', array( $this, 'maybe_flush_rewrites' ) );
 
 		}
 
@@ -57,18 +57,11 @@ if( !class_exists( 'WC_Product_Permalink' ) ){
 		}
 
 		/**
-		 * try to flush if in admin
-		 */
-		public function admin_init() {
-		    $this->flush_rewrites();
-		}
-
-		/**
 		 * public method to flush rewrites and update the database to 
 		 * prevent hot loading rewrites
 		 * @return null
 		 */
-		public function flush_rewrites(){
+		public function maybe_flush_rewrites(){
 			if ( 'yes' == get_option( self::$option_flush_key ) ) {
 		        flush_rewrite_rules();
 		        update_option( self::$option_flush_key, 'no');
@@ -78,7 +71,7 @@ if( !class_exists( 'WC_Product_Permalink' ) ){
 		/**
 		 * on plugin deactivate ensure the permalinks are flushed and db is cleaned up
 		 */
-		public function deactivate(){
+		public static function deactivate(){
 			flush_rewrite_rules();
 			delete_option( self::$option_flush_key );
 		}

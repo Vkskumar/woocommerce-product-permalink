@@ -21,6 +21,12 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 			add_filter( 'WC_Product_Permalink/query_vars', array( $this, 'custom_query_vars' ) );
 			add_filter( 'post_type_link', array( $this, 'post_type_link' ), 10, 3 );
 
+			
+			// assuming default woocommerce product types:
+			// * simple
+			// * variable
+			// * grouped
+			// * external
 			$this->product_types = apply_filters( 'WC_Product_Permalink/product_types', array( 
 				'simple' => 'simple-product', 
 				'variable' => 'variable-product', 
@@ -28,6 +34,7 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 				'external' => 'external-product'
 				));
 
+			// add_filter( 'admin_init', array( $this, 'create_rewrites' ), 10, 3 );
 			$this->create_rewrites();
 
 		}
@@ -48,11 +55,6 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 		 */
 		public function create_rewrites(){
 
-			// assuming default woocommerce product types:
-			// * simple
-			// * variable
-			// * grouped
-			// * external
 			foreach( $this->product_types as $product_type => $slug ){
 				$key = 'product_' . $product_type;
 				add_rewrite_tag( '%' . $key . '%', $slug, $this->query_var . '=' . $product_type . '&product=' );
@@ -112,8 +114,5 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 			update_option( parent::$option_flush_key, 'yes' );
 		}
 
-		public function deactivate(){
-			parent::deactivate();
-		}
 	}
 }

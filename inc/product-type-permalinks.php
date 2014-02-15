@@ -20,23 +20,40 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 			add_action( 'template_redirect', array( $this, 'template_redirect' ) );
 			add_filter( 'WC_Product_Permalink/query_vars', array( $this, 'custom_query_vars' ) );
 			add_filter( 'post_type_link', array( $this, 'post_type_link' ), 10, 3 );
-
+			add_filter( 'woocommerce_get_settings_pages', array( $this, 'add_settings' ) );
 			
-			// assuming default woocommerce product types:
-			// * simple
-			// * variable
-			// * grouped
-			// * external
-			$this->product_types = apply_filters( 'WC_Product_Permalink/product_types', array( 
-				'simple' => 'simple-product', 
-				'variable' => 'variable-product', 
-				'grouped' => 'grouped-product',
-				'external' => 'external-product'
-				));
+			$this->product_types = self::product_types();
 
 			// add_filter( 'admin_init', array( $this, 'create_rewrites' ), 10, 3 );
 			$this->create_rewrites();
 
+		}
+
+		public static function product_types(){
+			$product_types = array();
+
+			if( get_option('woocommerce_product_type_permalink_enabled') == 'yes' ) {
+				// assuming default woocommerce product types:
+				// * simple
+				// * variable
+				// * grouped
+				// * external
+				$default = array(
+					'simple'   => 'simple-product',
+					'variable' => 'variable-product',
+					'grouped'  => 'grouped-product',
+					'external' => 'external-product'
+					);
+				$configured_types = get_option('woocommerce_product_type_permalink_types');
+				$product_types = !empty($configured_types) ? $configured_types : $default;
+			}
+
+			return apply_filters( 'WC_Product_Type_Permalink/product_types', $product_types );
+		}
+
+		function add_settings( $settings ){
+			$settings[] = include( 'wc-settings-products-type-permalink.php' );
+			return $settings;
 		}
 
 		/**
@@ -53,7 +70,7 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 		/**
 		 * add custom permastructures for products
 		 */
-		public function create_rewrites(){
+		public function create_rewrites( $force = false ){
 
 			foreach( $this->product_types as $product_type => $slug ){
 				$key = 'product_' . $product_type;
@@ -62,6 +79,8 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 					'with_front' => false // matches the existing default structure of WooCommerce
 					));
 			}
+
+			parent::force_flush( $force );
 
 		}
 

@@ -69,7 +69,6 @@ if( !class_exists('WC_Product_Permalink_Factory') ){
 			// ensure the required files are loaded
 			$this->load_classes();
 
-			// Loaded action
 			do_action( 'WC_Product_Permalink_Factory/loaded' );
 			
 		}
@@ -77,7 +76,12 @@ if( !class_exists('WC_Product_Permalink_Factory') ){
 		private function includes() {
 
 			// assumes any file in inc should be included
-			$include_files = apply_filters( 'WC_Product_Permalink_Factory/include_files', glob( plugin_dir_path( __FILE__ ) . 'inc/*.php' ) );
+			// $file_list = glob( plugin_dir_path( __FILE__ ) . 'inc/*.php';
+			$file_list = array(
+				'inc/product-permalinks.php',
+				'inc/product-type-permalinks.php'
+				);
+			$include_files = apply_filters( 'WC_Product_Permalink_Factory/include_files', $file_list );
 			foreach ( $include_files as $file )
 	            include_once $file;
 

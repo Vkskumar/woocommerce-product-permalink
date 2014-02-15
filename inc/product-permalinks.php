@@ -19,10 +19,16 @@ if( !class_exists( 'WC_Product_Permalink' ) ){
 
 		function __construct(){
 			
+			add_filter( 'woocommerce_get_settings_pages', array( $this, 'add_settings' ) );
 			add_filter( 'woocommerce_register_post_type_product', array( $this, 'woocommerce_register_post_type_product' ) );
 			add_filter( 'query_vars', array( $this, 'query_vars' ) );
 			add_filter( 'admin_init', array( $this, 'maybe_flush_rewrites' ) );
 
+		}
+
+		function add_settings( $settings ){
+			$settings[] = include( 'wc-settings-products-permalink.php' );
+			return $settings;
 		}
 
 		/**
@@ -56,13 +62,19 @@ if( !class_exists( 'WC_Product_Permalink' ) ){
 			exit;
 		}
 
+		public static function force_flush( $force = false ){
+			// let the plugin know we need to flush the permalinks
+			if( $force )
+				update_option( self::$option_flush_key, 'yes' );
+		}
+
 		/**
 		 * public method to flush rewrites and update the database to 
 		 * prevent hot loading rewrites
 		 * @return null
 		 */
-		public function maybe_flush_rewrites(){
-			if ( 'yes' == get_option( self::$option_flush_key ) ) {
+		public function maybe_flush_rewrites( $force = false ){
+			if ( $force || 'yes' == get_option( self::$option_flush_key ) ) {
 		        flush_rewrite_rules();
 		        update_option( self::$option_flush_key, 'no');
 		    }

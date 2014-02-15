@@ -76,10 +76,10 @@ if( !class_exists('WC_Product_Permalink_Factory') ){
 
 		private function includes() {
 
-			// assumes plugin_dir_path( __FILE__ )
-			// include_once( 'inc/wc-product-type-settings.php');
-			include_once( 'inc/product-permalinks.php' );
-			include_once( 'inc/product-type-permalinks.php' );
+			// assumes any file in inc should be included
+			$include_files = apply_filters( 'WC_Product_Permalink_Factory/include_files', glob( plugin_dir_path( __FILE__ ) . 'inc/*.php' ) );
+			foreach ( $include_files as $file )
+	            include_once $file;
 
 			do_action( 'WC_Product_Permalink_Factory/includes' );
 

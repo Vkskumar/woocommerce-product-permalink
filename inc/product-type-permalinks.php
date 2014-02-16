@@ -20,7 +20,9 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 			add_action( 'template_redirect', array( $this, 'template_redirect' ) );
 			add_filter( 'WC_Product_Permalink/query_vars', array( $this, 'custom_query_vars' ) );
 			add_filter( 'post_type_link', array( $this, 'post_type_link' ), 10, 3 );
-			add_filter( 'woocommerce_get_settings_pages', array( $this, 'add_settings' ) );
+
+			if( apply_filters( 'WC_Product_Type_Permalink/enable_settings', '__return_true' ) )
+				add_filter( 'woocommerce_get_settings_pages', array( $this, 'add_settings' ) );
 			
 			$this->product_types = self::product_types();
 
@@ -29,7 +31,7 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 
 		}
 
-		public static function product_types(){
+		public static function product_types( $clean = true ){
 			$product_types = array();
 
 			if( get_option('woocommerce_product_type_permalink_enabled') == 'yes' ) {
@@ -47,7 +49,11 @@ if( !class_exists( 'WC_Product_Type_Permalink' ) ){
 				$configured_types = get_option('woocommerce_product_type_permalink_types');
 				$product_types = !empty($configured_types) ? $configured_types : $default;
 			}
+			// remove empty array items
+			if( $clean )
+				$product_types = array_filter( $product_types );
 
+			// filter the return
 			return apply_filters( 'WC_Product_Type_Permalink/product_types', $product_types );
 		}
 

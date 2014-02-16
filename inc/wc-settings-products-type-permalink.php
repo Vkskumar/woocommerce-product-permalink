@@ -7,7 +7,7 @@ class WC_Settings_Products_Type_Permalink extends WC_Settings_Products{
 	 */
 	public function __construct() {
 		$this->id    = 'products';
-		add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
+		// add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
 		add_filter( 'woocommerce_product_permalinks_settings', array( $this, 'permalink_type_get_settings' ) );
 		add_action( 'woocommerce_update_option_product_type_permalink_filter', array( $this, 'permalink_type_save' ) );
 		add_action( 'woocommerce_admin_field_product_type_permalink_filter', array( $this, 'permalink_type_field' ) );
@@ -17,13 +17,15 @@ class WC_Settings_Products_Type_Permalink extends WC_Settings_Products{
 	 * Save settings
 	 */
 	public function permalink_type_save( $value ) {
-		$post_types = array();
-
-		if ( !empty( $_POST[$value['id'] ]) ){
-			foreach( $_POST[ $value['id'] ] as $post_type ){
-	        	$option_value = wc_clean( stripslashes( $post_type ) );
-	        	if( !empty( $option_value ) )
-	        		$post_types[ $value['id'] ] = $option_value;
+		$saved_post_types = array();
+		$post_types = WC_Product_Type_Permalink::product_types( false );
+		$key = 'woocommerce_product_type_permalink_filter';
+		if ( !empty( $_POST[ $key ]) ){
+			foreach( $_POST[ $key ] as $post_type => $slug ){
+				if( ! array_key_exists( $post_type, $post_types) ) continue;
+	        	$slug = wc_clean( stripslashes( $slug ) );
+	        	// if( !empty( $slug ) )
+	        		$post_types[ $post_type ] = $slug;
 
 			}
 		}
@@ -121,8 +123,8 @@ class WC_Settings_Products_Type_Permalink extends WC_Settings_Products{
 				'show_if_checked' => 'yes',
 				'autoload'      => false
 			);
-			
-			foreach( WC_Product_Type_Permalink::product_types() as $product_type => $slug ){
+
+			foreach( WC_Product_Type_Permalink::product_types( false ) as $product_type => $slug ){
 				$new_settings[] = array(
 					'title' 	=> __('Product Type:') . ' ' . ucwords( $product_type ),
 					'id' 		=> 'woocommerce_product_type_permalink_filter[' . $product_type . ']',

@@ -1,7 +1,7 @@
 <?php
 
 class WC_Settings_Products_Type_Permalink extends WC_Settings_Products{
-
+	
 	/**
 	 * Constructor.
 	 */
@@ -111,35 +111,31 @@ class WC_Settings_Products_Type_Permalink extends WC_Settings_Products{
 	public function permalink_type_get_settings( $settings = array() ) {
 		global $current_section;
 
-		if ( $current_section == 'permalink' ) {
+		$new_settings[] = array( 'title' => __( 'Product Types', 'woocommerce' ), 'type' => 'title', 'desc' => '', 'id' => 'product_type_permalinks_options' );
+		$new_settings[] = array(
+			'title' => __( 'Enable', 'woocommerce' ),
+			'desc' 		=> __( 'Enable Product Type Filters', 'woocommerce' ),
+			'id' 		=> 'woocommerce_product_type_permalink_enabled',
+			'default'	=> 'no',
+			'type' 		=> 'checkbox',
+			'show_if_checked' => 'yes',
+			'autoload'      => false
+		);
 
-			$new_settings[] = array( 'title' => __( 'Product Types', 'woocommerce' ), 'type' => 'title', 'desc' => '', 'id' => 'product_type_permalinks_options' );
+		foreach( WC_Product_Type_Permalink::product_types( false ) as $product_type => $slug ){
 			$new_settings[] = array(
-				'title' => __( 'Enable', 'woocommerce' ),
-				'desc' 		=> __( 'Enable Product Type Filters', 'woocommerce' ),
-				'id' 		=> 'woocommerce_product_type_permalink_enabled',
-				'default'	=> 'no',
-				'type' 		=> 'checkbox',
-				'show_if_checked' => 'yes',
-				'autoload'      => false
+				'title' 	=> __('Product Type:') . ' ' . ucwords( $product_type ),
+				'id' 		=> 'woocommerce_product_type_permalink_filter[' . $product_type . ']',
+				'type' 		=> 'product_type_permalink_filter',
+				'default'	=> $slug,
+				'autoload'  => false
 			);
-
-			foreach( WC_Product_Type_Permalink::product_types( false ) as $product_type => $slug ){
-				$new_settings[] = array(
-					'title' 	=> __('Product Type:') . ' ' . ucwords( $product_type ),
-					'id' 		=> 'woocommerce_product_type_permalink_filter[' . $product_type . ']',
-					'type' 		=> 'product_type_permalink_filter',
-					'default'	=> $slug,
-					'autoload'  => false
-				);
-			}
-			$new_settings[] = array( 'type' => 'sectionend', 'id' => 'product_type_permalinks_options' );
-
-			$settings = array_merge( $settings, $new_settings);
-			return apply_filters('woocommerce_product_type_permalinks_settings', $settings );
-		} else {
-			return $settings;
 		}
+		$new_settings[] = array( 'type' => 'sectionend', 'id' => 'product_type_permalinks_options' );
+
+		$settings = array_merge( $settings, $new_settings);
+
+		return apply_filters('woocommerce_product_type_permalinks_settings', $settings );
 	}
 
 }

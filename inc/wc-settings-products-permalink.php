@@ -7,7 +7,7 @@ class WC_Settings_Products_Permalink extends WC_Settings_Products{
 	 */
 	public function __construct() {
 		$this->id    = 'products';
-		add_filter( 'woocommerce_sections_' . $this->id . '_array', array( $this, 'inject_section' ) );
+		add_filter( 'woocommerce_get_sections_' . $this->id, array( $this, 'inject_section' ) );
 		add_filter( 'woocommerce_product_settings', array( $this, 'permalink_get_settings' ) );
 	}
 
